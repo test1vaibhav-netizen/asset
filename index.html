@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vaibhav Saxena — Performance Marketer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f5f0;
+      --accent: #c9a84c;
+      --accent-dim: rgba(201,168,76,0.15);
+      --gray: #888;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      transition: background 0.3s;
+    }
+    nav.scrolled { background: rgba(10,10,10,0.97); }
+    .nav-logo {
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 600;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.75) 100%);
+    }
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 900px;
+      padding: 2rem;
+    }
+    .hero-eyebrow {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-headline {
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      line-height: 1.1;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp 0.8s 0.55s forwards;
+    }
+    .hero-headline em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      margin-top: 2rem;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 1rem;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .hero-cta {
+      margin-top: 3rem;
+      display: inline-flex;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.05s forwards;
+    }
+    .btn {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.9rem 2.2rem;
+      border-radius: 2px;
+      transition: all 0.25s;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--black);
+      border: 1px solid var(--accent);
+      font-weight: 700;
+    }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s 1.5s forwards;
+    }
+    .scroll-indicator span {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 8rem 3rem; }
+    .section-label {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── TAGLINE SECTION ── */
+    .tagline-section {
+      background: var(--white);
+      color: var(--black);
+      text-align: center;
+      padding: 7rem 3rem;
+    }
+    .tagline-text {
+      font-size: clamp(1.8rem, 4vw, 3.5rem);
+      line-height: 1.3;
+      font-weight: 400;
+      max-width: 800px;
+      margin: 0 auto;
+      letter-spacing: -0.01em;
+    }
+    .tagline-attr {
+      margin-top: 2rem;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #777;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    .about-headline {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      line-height: 1.2;
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+    .about-body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(245,245,240,0.7);
+      margin-bottom: 1.5rem;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 2.5rem;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      color: var(--accent);
+      font-weight: 400;
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 0.4rem;
+    }
+
+    /* ── SERVICES ── */
+    .services-section { background: #0f0f0f; }
+    .services-header {
+      max-width: 1100px;
+      margin: 0 auto 4rem;
+    }
+    .services-headline {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 400;
+      max-width: 600px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--border);
+    }
+    .service-card {
+      background: #0f0f0f;
+      padding: 3rem 2.5rem;
+      transition: background 0.3s;
+    }
+    .service-card:hover { background: #141414; }
+    .service-number {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+    }
+    .service-title {
+      font-size: 1.35rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .service-desc {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--gray);
+    }
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .tag {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border);
+      color: var(--gray);
+      border-radius: 2px;
+    }
+
+    /* ── VIDEO SHOWCASE ── */
+    .video-section {
+      padding: 0;
+      position: relative;
+      height: 70vh;
+      overflow: hidden;
+    }
+    .showcase-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+    .video-caption {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      background: rgba(10,10,10,0.5);
+    }
+    .video-caption h2 {
+      font-size: clamp(1.5rem, 3vw, 2.8rem);
+      font-weight: 400;
+      max-width: 600px;
+      line-height: 1.3;
+    }
+    .video-caption p {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      color: var(--gray);
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* ── PROCESS ── */
+    .process-list {
+      max-width: 800px;
+      margin: 0 auto;
+      counter-reset: process;
+    }
+    .process-item {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 2rem;
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+      counter-increment: process;
+    }
+    .process-item:first-child { border-top: 1px solid var(--border); }
+    .process-num {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      padding-top: 0.4rem;
+    }
+    .process-title {
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+    .process-desc {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--gray);
+    }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      background: var(--white);
+      color: var(--black);
+      text-align: center;
+    }
+    .contact-headline {
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 800px;
+      margin: 0 auto 3rem;
+    }
+    .contact-details {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .contact-item a,
+    .contact-item span {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 1rem;
+      color: #333;
+      text-decoration: none;
+      display: block;
+    }
+    .contact-item a:hover { color: #000; text-decoration: underline; }
+    .contact-item-label {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 0.4rem;
+    }
+    .btn-dark {
+      background: var(--black);
+      color: var(--white);
+      border: 1px solid var(--black);
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 1rem 2.5rem;
+      display: inline-block;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      transition: all 0.25s;
+      border-radius: 2px;
+    }
+    .btn-dark:hover { background: transparent; color: var(--black); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+    .footer-name {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .footer-copy {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.72rem;
+      color: #444;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.4; transform: scaleY(0.7); }
+    }
+
+    /* reveal-on-scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      section { padding: 5rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      .contact-details { gap: 2rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">Vaibhav Saxena</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline
+      src="vecteezy_3d-background-abstract-satisfying-abstract-animation_23957110 (1).mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Founder &amp; Performance Marketer</p>
+      <h1 class="hero-headline">
+        Results that <em>move</em><br>the needle. Every time.
+      </h1>
+      <p class="hero-sub">Paid media · Growth strategy · Revenue optimization</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-primary">Work With Me</a>
+        <a href="#services" class="btn btn-ghost">What I Do</a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- TAGLINE BANNER -->
+  <div class="tagline-section">
+    <p class="tagline-text reveal">
+      "You can hire cheaper.<br>You'll also pay twice."
+    </p>
+    <p class="tagline-attr reveal">— Vaibhav Saxena</p>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about" style="padding: 8rem 3rem;">
+    <div class="about-grid">
+      <div>
+        <p class="section-label reveal">About</p>
+        <h2 class="about-headline reveal">
+          Performance marketing that's built on data — not guesswork.
+        </h2>
+        <p class="about-body reveal">
+          I'm Vaibhav Saxena, a founder with a sharp focus on one thing:
+          turning ad spend into measurable revenue. With years of experience
+          running high-stakes campaigns across Meta, Google, and beyond, I've
+          learned that strategy without execution is just theory.
+        </p>
+        <p class="about-body reveal">
+          I work with founders and growth teams who want to stop bleeding money
+          on ads and start scaling predictably. My approach is direct, rigorous,
+          and entirely focused on your bottom line.
+        </p>
+        <a href="#contact" class="btn btn-primary reveal" style="margin-top:1rem;">
+          Let's Talk
+        </a>
+      </div>
+      <div class="about-stats reveal">
+        <div>
+          <div class="stat-number">₹Cr+</div>
+          <div class="stat-label">Ad Spend Managed</div>
+        </div>
+        <div>
+          <div class="stat-number">3×</div>
+          <div class="stat-label">Average ROAS Improvement</div>
+        </div>
+        <div>
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Campaigns Scaled</div>
+        </div>
+        <div>
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Accountability</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="services-section">
+    <div class="services-header">
+      <p class="section-label reveal">Services</p>
+      <h2 class="services-headline reveal">
+        What I bring to your growth engine.
+      </h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-number">01</div>
+        <h3 class="service-title">Paid Media Strategy &amp; Execution</h3>
+        <p class="service-desc">
+          End-to-end management of paid campaigns across Meta, Google, and YouTube.
+          From creative briefs to bid strategies — built for profitable scale.
+        </p>
+        <div class="service-tags">
+          <span class="tag">Meta Ads</span>
+          <span class="tag">Google Ads</span>
+          <span class="tag">YouTube</span>
+        </div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-number">02</div>
+        <h3 class="service-title">Funnel &amp; Conversion Optimization</h3>
+        <p class="service-desc">
+          Diagnosing where your funnel leaks and fixing it — landing pages,
+          offers, ad copy, and audience targeting working in concert.
+        </p>
+        <div class="service-tags">
+          <span class="tag">CRO</span>
+          <span class="tag">A/B Testing</span>
+          <span class="tag">Copy</span>
+        </div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-number">03</div>
+        <h3 class="service-title">Growth Consulting for Founders</h3>
+        <p class="service-desc">
+          Strategic advisory for founders who want clarity on their paid growth
+          channels — what to scale, what to cut, and how to build a repeatable
+          acquisition engine.
+        </p>
+        <div class="service-tags">
+          <span class="tag">Strategy</span>
+          <span class="tag">Advisory</span>
+          <span class="tag">Audits</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO SHOWCASE -->
+  <div class="video-section">
+    <video class="showcase-video" autoplay muted loop playsinline
+      src="Anime_Motorcycle_Cliffside_Serenity_Loop.mp4">
+    </video>
+    <div class="video-caption">
+      <h2 class="reveal">Precision over volume.<br>Always.</h2>
+      <p class="reveal">Every rupee of ad spend is a decision. Make it count.</p>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <section id="process" style="padding: 8rem 3rem;">
+    <div style="max-width:800px; margin:0 auto 4rem;">
+      <p class="section-label reveal">How I Work</p>
+      <h2 class="reveal" style="font-size:clamp(2rem,3.5vw,3rem); font-weight:400;">
+        A process that doesn't waste your time.
+      </h2>
+    </div>
+    <div class="process-list">
+      <div class="process-item reveal">
+        <div class="process-num">01</div>
+        <div>
+          <h3 class="process-title">Audit &amp; Diagnose</h3>
+          <p class="process-desc">
+            Before touching a single campaign, I tear apart what's already running.
+            Account structure, creative, audiences, attribution — nothing gets missed.
+          </p>
+        </div>
+      </div>
+      <div class="process-item reveal">
+        <div class="process-num">02</div>
+        <div>
+          <h3 class="process-title">Strategy &amp; Roadmap</h3>
+          <p class="process-desc">
+            A clear 90-day plan with prioritized actions, budget recommendations,
+            and projected outcomes — no fluff, no jargon.
+          </p>
+        </div>
+      </div>
+      <div class="process-item reveal">
+        <div class="process-num">03</div>
+        <div>
+          <h3 class="process-title">Execute &amp; Iterate</h3>
+          <p class="process-desc">
+            Weekly optimizations, creative testing, and data-driven decisions.
+            Every lever is pulled with intent.
+          </p>
+        </div>
+      </div>
+      <div class="process-item reveal">
+        <div class="process-num">04</div>
+        <div>
+          <h3 class="process-title">Scale What Works</h3>
+          <p class="process-desc">
+            Once we have a winning formula, we scale intelligently — protecting
+            margins while expanding reach.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact-section">
+    <p class="section-label" style="color:#999;">Contact</p>
+    <h2 class="contact-headline reveal">
+      Ready to stop leaving money on the table?
+    </h2>
+    <div class="contact-details reveal">
+      <div class="contact-item">
+        <div class="contact-item-label">Email</div>
+        <a href="mailto:vaibhavsaxena7890@gmail.com">vaibhavsaxena7890@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-label">Phone</div>
+        <a href="tel:+916397436033">+91 6397 436 033</a>
+      </div>
+    </div>
+    <a href="mailto:vaibhavsaxena7890@gmail.com" class="btn-dark reveal">
+      Start the Conversation
+    </a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-name">Vaibhav Saxena</span>
+    <span class="footer-copy">© 2026 · Founder &amp; Performance Marketer</span>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
